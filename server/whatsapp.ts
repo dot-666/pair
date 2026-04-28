@@ -129,7 +129,7 @@ const PAIRING_CODE_DELAY = 5000; // Increased delay for better stability
 
 function generateSessionId(): string {
   const hex = randomBytes(4).toString("hex");
-  return `wolf_${hex}`;
+  return `ultra_${hex}`;
 }
 
 function getAuthDir(sessionId: string): string {

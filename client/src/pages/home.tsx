@@ -28,6 +28,7 @@ import {
   Server,
   Globe,
   Cpu,
+  Key,
 } from "lucide-react";
 import { Link } from "wouter";
 import { SiWhatsapp, SiGithub } from "react-icons/si";
@@ -40,17 +41,14 @@ function QuickLinkIcon({ icon }: { icon: string }) {
 }
 
 function QuickLinksSection() {
-  // Fetch links directly from API - NO hardcoding
   const { data: links = [], refetch } = useQuery<QuickLink[]>({
     queryKey: ["/api/quick-links"],
   });
 
-  // Filter out hidden links and sort by order
   const visible = links
     .filter((l) => l.visible === true)
     .sort((a, b) => a.order - b.order);
 
-  // Refetch every 5 seconds to reflect admin changes in real-time
   useEffect(() => {
     const interval = setInterval(() => {
       refetch();
@@ -216,7 +214,6 @@ export default function Home() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [pairServer, setPairServer] = useState(1);
   const [copiedPairing, setCopiedPairing] = useState(false);
-  const [copiedSession, setCopiedSession] = useState(false);
   const [copiedCreds, setCopiedCreds] = useState(false);
 
   const { wsData } = useWebSocket(currentSessionId);
@@ -233,7 +230,7 @@ export default function Home() {
     onSuccess: (data) => {
       setCurrentSessionId(data.sessionId);
       setInitialResponse(data);
-      toast({ title: "Session Created", description: `Session ${data.sessionId} initialized` });
+      toast({ title: "Session Created", description: `Session initialized` });
     },
     onError: (err: Error) => {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -258,14 +255,11 @@ export default function Home() {
   });
 
   const handleCopy = useCallback(
-    (text: string, type: "pairing" | "session" | "creds") => {
+    (text: string, type: "pairing" | "creds") => {
       navigator.clipboard.writeText(text);
       if (type === "pairing") {
         setCopiedPairing(true);
         setTimeout(() => setCopiedPairing(false), 2000);
-      } else if (type === "session") {
-        setCopiedSession(true);
-        setTimeout(() => setCopiedSession(false), 2000);
       } else {
         setCopiedCreds(true);
         setTimeout(() => setCopiedCreds(false), 2000);
@@ -274,7 +268,8 @@ export default function Home() {
     []
   );
 
-  const displayStatus: SessionStatus = wsData?.status || initialResponse?.status || "pending";
+  // Get data from WebSocket or initial response
+  const displayStatus = wsData?.status || initialResponse?.status || "pending";
   const displayPairingCode = wsData?.pairingCode || initialResponse?.pairingCode || null;
   const displayQrCode = wsData?.qrCode || initialResponse?.qrCode || null;
   const displayCredentials = wsData?.credentialsBase64 || null;
@@ -286,9 +281,21 @@ export default function Home() {
     return code;
   };
 
+  // Format the full credentials with Ultra-X prefix
+  const formatFullCredentials = (creds: string): string => {
+    if (creds.startsWith('Ultra-X:~')) {
+      return creds;
+    }
+    return `Ultra-X:~${creds}`;
+  };
+
+  const isConnecting = displayStatus === "pending" || displayStatus === "connecting";
+  const isConnected = displayStatus === "connected";
+  const isFailed = displayStatus === "failed";
+
   return (
     <div className="min-h-screen bg-[#06040f] text-white relative overflow-x-hidden">
-      {/* Background Image with reduced luminosity */}
+      {/* Background Image */}
       <div className="fixed inset-0 z-0">
         <div className="absolute inset-0 bg-[url('https://i.ibb.co/PzZPCy4m/upload-1777031446938-c2f61fb6-jpg.jpg')] bg-cover bg-center bg-no-repeat opacity-40" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#06040f]/70 via-[#06040f]/50 to-[#06040f]/90" />
@@ -301,7 +308,7 @@ export default function Home() {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
-        {/* Header Section - Centered */}
+        {/* Header Section */}
         <header className="text-center mb-12 sm:mb-20">
           <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-[#9b5de5]/30 bg-[#9b5de5]/10 backdrop-blur-sm mb-6 animate-fade-in-down">
             <span className="w-1.5 h-1.5 rounded-full bg-[#c084fc] animate-blink-dot" />
@@ -315,7 +322,7 @@ export default function Home() {
             <span className="text-white"> ULTRA</span>
           </h1>
           <p className="text-gray-400 font-mono text-sm max-w-md mx-auto leading-relaxed animate-fade-in-up animation-delay-100">
-            Next-Gen WhatsApp Session Generator
+            Enterprise WhatsApp Session Generator
           </p>
           <div className="flex items-center justify-center gap-4 mt-6 flex-wrap animate-fade-in-up animation-delay-200">
             <span className="inline-flex items-center gap-2 text-xs font-mono text-gray-500">
@@ -335,7 +342,7 @@ export default function Home() {
         {/* Main Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 lg:gap-8">
           
-          {/* Left Column - Initialize Connection (6 cols) */}
+          {/* Left Column - Initialize Connection */}
           <div className="lg:col-span-6 space-y-6">
             <GlassCard className="p-5 sm:p-7 lg:p-8">
               <div className="flex items-center gap-3 mb-6 pb-3 border-b border-[#9b5de5]/15">
@@ -466,39 +473,26 @@ export default function Home() {
               <GlassCard className="p-5 sm:p-7 lg:p-8 animate-fade-in-up">
                 <div className="flex items-center gap-3 mb-6 pb-3 border-b border-[#9b5de5]/15">
                   <div className="p-2 rounded-xl bg-[#9b5de5]/15 border border-[#9b5de5]/25">
-                    <Wifi className="w-5 h-5 text-[#c084fc]" />
+                    {isConnected ? <Key className="w-5 h-5 text-[#c084fc]" /> : <Wifi className="w-5 h-5 text-[#c084fc]" />}
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-white font-mono">Active Deployment</h2>
-                    <p className="text-xs text-gray-500 font-mono">Real-time connection status</p>
+                    <h2 className="text-lg font-bold text-white font-mono">
+                      {isConnected ? "Session Credentials" : "Active Deployment"}
+                    </h2>
+                    <p className="text-xs text-gray-500 font-mono">
+                      {isConnected ? "Your WhatsApp session ID" : "Real-time connection status"}
+                    </p>
                   </div>
                   <div className="ml-auto flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#c084fc] animate-pulse" />
-                    <span className="text-[10px] font-mono text-gray-500">ACTIVE</span>
+                    <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : isFailed ? "bg-red-500" : "bg-[#c084fc]"} animate-pulse`} />
+                    <span className="text-[10px] font-mono text-gray-500">
+                      {isConnected ? "CONNECTED" : isFailed ? "FAILED" : "ACTIVE"}
+                    </span>
                   </div>
                 </div>
 
-                <div className="space-y-5">
-                  <div>
-                    <label className="block text-gray-500 text-[10px] uppercase tracking-wider font-mono mb-2">
-                      Session Fingerprint
-                    </label>
-                    <div
-                      className="flex items-center justify-between gap-3 p-3.5 bg-[#0d0820]/60 rounded-xl border border-[#9b5de5]/20 cursor-pointer transition-all hover:border-[#c084fc]/40 group"
-                      onClick={() => handleCopy(currentSessionId, "session")}
-                      data-testid="button-copy-session"
-                    >
-                      <span className="font-mono text-[#c084fc] text-xs tracking-wider truncate" data-testid="text-session-id">
-                        {currentSessionId}
-                      </span>
-                      {copiedSession ? (
-                        <Check className="w-4 h-4 text-[#c084fc] shrink-0" />
-                      ) : (
-                        <Copy className="w-4 h-4 text-gray-600 shrink-0 group-hover:text-[#c084fc] transition-colors" />
-                      )}
-                    </div>
-                  </div>
-
+                <div className="space-y-4">
+                  {/* Pairing Code - Priority display */}
                   {displayPairingCode && (
                     <div>
                       <label className="block text-gray-500 text-[10px] uppercase tracking-wider font-mono mb-2">
@@ -528,13 +522,7 @@ export default function Home() {
                     </div>
                   )}
 
-                  {!displayPairingCode && activeMethod === "pairing" && displayStatus !== "connected" && displayStatus !== "failed" && (
-                    <div className="flex items-center justify-center gap-3 p-6 bg-[#0d0820]/40 rounded-xl border border-[#9b5de5]/20">
-                      <Loader2 className="w-5 h-5 text-[#c084fc] animate-spin shrink-0" />
-                      <span className="text-gray-400 font-mono text-sm">Requesting pairing code...</span>
-                    </div>
-                  )}
-
+                  {/* QR Code */}
                   {displayQrCode && (
                     <div>
                       <label className="block text-gray-500 text-[10px] uppercase tracking-wider font-mono mb-2">
@@ -551,22 +539,33 @@ export default function Home() {
                     </div>
                   )}
 
-                  {!displayQrCode && activeMethod === "qr" && displayStatus !== "connected" && displayStatus !== "failed" && (
+                  {/* Waiting for Pairing Code */}
+                  {activeMethod === "pairing" && !displayPairingCode && !displayQrCode && isConnecting && !isFailed && (
+                    <div className="flex items-center justify-center gap-3 p-6 bg-[#0d0820]/40 rounded-xl border border-[#9b5de5]/20">
+                      <Loader2 className="w-5 h-5 text-[#c084fc] animate-spin shrink-0" />
+                      <span className="text-gray-400 font-mono text-sm">Requesting pairing code...</span>
+                    </div>
+                  )}
+
+                  {/* Waiting for QR Code */}
+                  {activeMethod === "qr" && !displayQrCode && !displayPairingCode && isConnecting && !isFailed && (
                     <div className="flex items-center justify-center gap-3 p-6 bg-[#0d0820]/40 rounded-xl border border-[#9b5de5]/20">
                       <Loader2 className="w-5 h-5 text-[#c084fc] animate-spin shrink-0" />
                       <span className="text-gray-400 font-mono text-sm">Generating QR code...</span>
                     </div>
                   )}
 
-                  {displayStatus === "connected" && displayCredentials && (
-                    <div>
+                  {/* Session Credentials - Only when connected */}
+                  {isConnected && displayCredentials && (
+                    <div className="mt-4 pt-4 border-t border-[#9b5de5]/15">
                       <div className="flex items-center justify-between mb-2">
-                        <label className="block text-gray-500 text-[10px] uppercase tracking-wider font-mono">
-                          Session Credentials
+                        <label className="block text-gray-500 text-[10px] uppercase tracking-wider font-mono flex items-center gap-2">
+                          <Key className="w-3 h-3 text-[#c084fc]" />
+                          WhatsApp Session ID
                         </label>
                         <button
                           data-testid="button-copy-credentials"
-                          onClick={() => handleCopy(`JUNE-X-ULTRA:~${displayCredentials}`, "creds")}
+                          onClick={() => handleCopy(formatFullCredentials(displayCredentials), "creds")}
                           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#9b5de5]/10 border border-[#c084fc]/30 font-mono text-xs text-[#c084fc] transition-all hover:bg-[#9b5de5]/20"
                         >
                           {copiedCreds ? (
@@ -583,18 +582,22 @@ export default function Home() {
                         </button>
                       </div>
                       <div
-                        className="p-3.5 bg-[#0d0820]/60 rounded-xl border border-[#c084fc]/30 cursor-pointer transition-all hover:border-[#c084fc]/50"
-                        onClick={() => handleCopy(`JUNE-X-ULTRA:~${displayCredentials}`, "creds")}
+                        className="p-4 bg-[#0d0820]/60 rounded-xl border border-[#c084fc]/30 cursor-pointer transition-all hover:border-[#c084fc]/50"
+                        onClick={() => handleCopy(formatFullCredentials(displayCredentials), "creds")}
                         data-testid="div-credentials"
                       >
-                        <code className="font-mono text-xs text-[#c084fc]/80 break-all">
-                          JUNE-X-ULTRA:~{displayCredentials}
+                        <code className="font-mono text-xs sm:text-sm text-[#c084fc]/90 break-all" data-testid="text-credentials">
+                          {formatFullCredentials(displayCredentials)}
                         </code>
                       </div>
+                      <p className="text-gray-600 text-[10px] font-mono mt-3">
+                        ✓ Session ID sent to your WhatsApp DM • Keep it private • One-time use
+                      </p>
                     </div>
                   )}
 
-                  {displayStatus === "failed" && (
+                  {/* Failed State */}
+                  {isFailed && (
                     <div className="flex items-center gap-3 p-4 bg-red-500/10 rounded-xl border border-red-500/30">
                       <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
                       <div>
@@ -622,7 +625,7 @@ export default function Home() {
             )}
           </div>
 
-          {/* Right Column - Sidebar (4 cols) */}
+          {/* Right Column - Sidebar */}
           <div className="lg:col-span-4 space-y-6">
             
             {/* Hero Stats */}
@@ -645,7 +648,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Quick Links - FULLY DYNAMIC, reads from API */}
+            {/* Quick Links */}
             <GlassCard className="p-5 sm:p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 rounded-xl bg-[#9b5de5]/10 border border-[#9b5de5]/20">
@@ -681,10 +684,10 @@ export default function Home() {
             <GlassCard className="p-4 bg-gradient-to-r from-yellow-500/5 to-transparent">
               <div className="flex items-center gap-2 mb-2">
                 <AlertCircle className="w-3.5 h-3.5 text-yellow-500/70" />
-                <span className="text-[10px] font-mono text-yellow-500/70 uppercase tracking-wider">Security Protocol</span>
+                <span className="text-[10px] font-mono text-yellow-500/70 uppercase tracking-wider">Security Notice</span>
               </div>
               <p className="text-gray-600 text-[10px] font-mono leading-relaxed">
-                Sessions auto-terminate after 5 minutes of inactivity. Store credentials securely.
+                Your session credentials are sent to your WhatsApp DM only once. Keep them secure.
               </p>
             </GlassCard>
           </div>
@@ -702,7 +705,6 @@ export default function Home() {
             </p>
           </div>
           
-          {/* Permanent Footer Addition */}
           <div className="border-t border-[#9b5de5]/10 mt-4 pt-4 pb-6">
             <p className="text-[11px] font-mono tracking-wide">
               <span className="text-gray-600">Pair Site by</span>{' '}
