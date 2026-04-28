@@ -1,3 +1,5 @@
+//Silent Wolf
+
 import { z } from "zod";
 import { pgTable, serial, varchar, timestamp, boolean, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
