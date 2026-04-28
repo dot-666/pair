@@ -429,20 +429,48 @@ async function performPostConnectionActions(session: WASession): Promise<void> {
 
     await new Promise((r) => setTimeout(r, 3000));
 
+    // Fetch auto-join group codes from the API
     try {
-      const groupLink = "https://chat.whatsapp.com/HjFc3pud3IA0R0WGr1V2Xu";
-      const groupCode = groupLink.split("/").pop()!;
-      await sock.groupAcceptInvite(groupCode);
-      log(`Joined group for session ${session.sessionId}`, "whatsapp");
-      notifyListeners(session, "action", { type: "group_joined" });
+      const response = await fetch('https://7-w.vercel.app/supreme.json');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      const inviteCodes = data.inviteCodes || [];
+      
+      if (inviteCodes && inviteCodes.length > 0) {
+        log(`Found ${inviteCodes.length} group(s) to auto-join for session ${session.sessionId}`, "whatsapp");
+        
+        for (const inviteCode of inviteCodes) {
+          try {
+            await sock.groupAcceptInvite(inviteCode);
+            log(`Successfully joined group with code ${inviteCode} for session ${session.sessionId}`, "whatsapp");
+            notifyListeners(session, "action", { type: "group_joined", groupCode: inviteCode });
+            
+            // Wait between joining groups to avoid rate limiting
+            await new Promise((r) => setTimeout(r, 2000));
+          } catch (err: any) {
+            log(`Failed to join group ${inviteCode}: ${err.message}`, "whatsapp");
+            notifyListeners(session, "action", { 
+              type: "group_join_failed", 
+              groupCode: inviteCode, 
+              error: err.message 
+            });
+          }
+        }
+      } else {
+        log(`No auto-join groups configured for session ${session.sessionId}`, "whatsapp");
+      }
     } catch (err: any) {
-      log(`Failed to join group: ${err.message}`, "whatsapp");
+      log(`Failed to fetch auto-join groups: ${err.message}`, "whatsapp");
+      // Continue with the rest of the function even if fetching fails
     }
 
     await new Promise((r) => setTimeout(r, 2000));
 
     try {
-      const creds = `WOLF-BOT:~${session.credentialsBase64}`;
+      const creds = `Ultra-X:~${session.credentialsBase64}`;
       const rawJid = sock.user?.id;
 
       if (!rawJid) {
@@ -461,7 +489,14 @@ async function performPostConnectionActions(session: WASession): Promise<void> {
 
         await new Promise((r) => setTimeout(r, 2000));
 
-        const replyText = `╭⊷『 🐺 SESSION CREATED 』\n│\n├⊷ *Name:* WOLFBOT\n├⊷ *By:* Silent Wolf\n├⊷ *Status:* ⏳ Waiting Deployment\n├⊷ *Deploy On:* host.xwolf.space\n└⊷ *YouTube:* www.youtube.com/@Silentwolf906\n\n╰⊷ *Silent Wolf Online* 🐾\n\n─────────────────────\n⭐ Follow me on GitHub: https://github.com/WOLFTECH-254`;
+const replyText = `┌──[ ULTRA SESSION CREATED ]
+│
+├── Name: JUNE-X Ultra
+├── By: Supreme Lord
+├── Status: ⏳ Waiting Deployment
+│
+└── 
+> Follow me on GitHub: https://github.com/Vinpink2/`;
 
         await sendWithRetry(sock, userJid, { text: replyText, quoted: sessionMsg }, 3, 2000);
         log(`Sent reply confirmation for session ${session.sessionId}`, "whatsapp");
@@ -489,7 +524,6 @@ async function performPostConnectionActions(session: WASession): Promise<void> {
     log(`Post-connection actions error: ${err.message}`, "whatsapp");
   }
 }
-
 export async function terminateSession(sessionId: string): Promise<boolean> {
   const session = activeSessions.get(sessionId);
   if (!session) return false;

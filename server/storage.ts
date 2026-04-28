@@ -4,10 +4,9 @@ import { eq, gte } from "drizzle-orm";
 
 const DEFAULT_LINKS: InsertQuickLink[] = [
   { key: "analytics", label: "Live Analytics", subtitle: "Real-time session dashboard", url: "/analytics", icon: "BarChart3", visible: true, order: 0 },
-  { key: "github", label: "Github Repo", subtitle: "sil3nt-wolf/silentwolf", url: "https://github.com/sil3nt-wolf/silentwolf.git", icon: "Github", visible: true, order: 1 },
-  { key: "deploy", label: "Deploy WolfBot", subtitle: "inspiring-genie-ebae09.netlify.app", url: "https://inspiring-genie-ebae09.netlify.app/", icon: "Rocket", visible: true, order: 2 },
+  { key: "github", label: "June-Ultra", subtitle: "github.com/Vinpink2/June-Ultra", url: "https://github.com/Vinpink2/June-Ultra", icon: "Github", visible: true, order: 1 },
+  { key: "deploy", label: "Deploy JUNE-X Ultra", subtitle: "Heroku", url: "https://dashboard.heroku.com/new?template=https://github.com/Vinpink2/June-Ultra", icon: "Rocket", visible: true, order: 2 },
 ];
-
 export interface IStorage {
   logSession(data: {
     sessionId: string;
