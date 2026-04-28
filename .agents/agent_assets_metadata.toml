@@ -1,8 +1,0 @@
-uploads = []
-generated = []
-
-[[outputs]]
-id = "Pdvylh-vfEAlG6PeN3sPN"
-uri = "file://WOLFBOT_PROJECT_GUIDE.txt"
-type = "text"
-title = "WOLFBOT Project Guide"
