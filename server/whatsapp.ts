@@ -238,13 +238,13 @@ async function connectSession(session: WASession, pairServer: number = 1): Promi
     log(`Failed to fetch version, using fallback: ${version.join(".")} on Server ${pairServer}`, "whatsapp");
   }
 
-  const browsers = [
-    Browsers.macOS("Chrome"),
-    Browsers.ubuntu("Chrome"),
-    Browsers.windows("Edge"),
-    Browsers.macOS("Safari"),
-    Browsers.ubuntu("Firefox")
-  ];
+ const browsers = [
+  Browsers.ubuntu("Chrome"),
+  Browsers.ubuntu("Firefox"),
+  Browsers.ubuntu("Edge"),
+  Browsers.ubuntu("Brave"),
+  Browsers.ubuntu("Opera")
+];
 
   const sock = makeWASocket({
     version,
