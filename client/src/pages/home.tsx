@@ -293,14 +293,6 @@ export default function Home() {
   const isConnected = displayStatus === "connected";
   const isFailed = displayStatus === "failed";
 
-  const serverOptions = [
-    { id: 1, name: "S1", status: "optimal", region: "US-EAST" },
-    { id: 2, name: "S2", status: "optimal", region: "EU-WEST" },
-    { id: 3, name: "S3", status: "optimal", region: "ASIA-SG" },
-    { id: 4, name: "S4", status: "optimal", region: "ASIA-IN" },
-    { id: 5, name: "S5", status: "optimal", region: "AU-SYD" },
-  ];
-
   return (
     <div className="min-h-screen bg-[#06040f] text-white relative overflow-x-hidden">
       {/* Background Image */}
@@ -405,22 +397,21 @@ export default function Home() {
                           Select Pair Server
                         </label>
                         <div className="grid grid-cols-5 gap-2">
-                          {serverOptions.map((server) => (
+                          {[1, 2, 3, 4, 5].map((num) => (
                             <button
-                              key={server.id}
-                              data-testid={`button-server-${server.id}`}
-                              onClick={() => setPairServer(server.id)}
-                              className={`py-3 px-2 rounded-xl border font-mono text-xs transition-all duration-300 transform hover:scale-105 relative overflow-hidden group ${
-                                pairServer === server.id
+                              key={num}
+                              data-testid={`button-server-${num}`}
+                              onClick={() => setPairServer(num)}
+                              className={`py-3 px-2 rounded-xl border font-mono text-sm transition-all duration-300 transform hover:scale-105 relative overflow-hidden group font-bold ${
+                                pairServer === num
                                   ? "bg-gradient-to-br from-[#9b5de5]/25 to-[#7c3aed]/15 border-[#c084fc]/60 text-[#c084fc] shadow-lg shadow-[#9b5de5]/20"
                                   : "bg-[#0d0820]/60 text-gray-400 border-[#9b5de5]/20 hover:border-[#9b5de5]/40 hover:text-gray-200"
                               }`}
                             >
                               <div className="relative z-10">
-                                <div className="font-bold text-sm">{server.name}</div>
-                                <div className="text-[9px] text-gray-500 mt-0.5">{server.region}</div>
+                                Pair {num}
                               </div>
-                              {pairServer === server.id && (
+                              {pairServer === num && (
                                 <div className="absolute top-1 right-1 w-2 h-2 bg-[#c084fc] rounded-full animate-pulse" />
                               )}
                             </button>
@@ -428,7 +419,7 @@ export default function Home() {
                         </div>
                         {pairServer && (
                           <p className="text-gray-500 text-[10px] font-mono mt-3 text-center">
-                            Selected: <span className="text-[#c084fc]">{serverOptions.find(s => s.id === pairServer)?.region}</span>
+                            Selected: <span className="text-[#c084fc] font-bold">Pair {pairServer}</span>
                           </p>
                         )}
                       </div>
