@@ -62,7 +62,7 @@ function QuickLinksSection() {
         const isInternal = link.url.startsWith("/");
         const inner = (
           <div
-            className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-[#0d0820]/40 backdrop-blur-sm border border-[#9b5de5]/20 transition-all duration-200 hover:border-[#c084fc]/40 hover:bg-[#9b5de5]/10 group cursor-pointer"
+            className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-[#0d0820]/40 backdrop-blur-sm border border-[#9b5de5]/20 transition-all duration-200 hover:border-[#c084fc]/40 hover:bg-[#9b5de5]/15 group"
             data-testid={`link-${link.key}`}
           >
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#9b5de5]/15 border border-[#9b5de5]/25 flex items-center justify-center shrink-0">
@@ -293,6 +293,14 @@ export default function Home() {
   const isConnected = displayStatus === "connected";
   const isFailed = displayStatus === "failed";
 
+  const serverOptions = [
+    { id: 1, name: "S1", status: "optimal", region: "US-EAST" },
+    { id: 2, name: "S2", status: "optimal", region: "EU-WEST" },
+    { id: 3, name: "S3", status: "optimal", region: "ASIA-SG" },
+    { id: 4, name: "S4", status: "optimal", region: "ASIA-IN" },
+    { id: 5, name: "S5", status: "optimal", region: "AU-SYD" },
+  ];
+
   return (
     <div className="min-h-screen bg-[#06040f] text-white relative overflow-x-hidden">
       {/* Background Image */}
@@ -339,357 +347,377 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Main Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 lg:gap-8">
+        {/* Main Floating Container */}
+        <div className="relative">
+          {/* Glow Effect */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-[#9b5de5]/30 via-[#c084fc]/20 to-[#9b5de5]/30 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse" style={{animationDuration: '3s'}} />
           
-          {/* Left Column - Initialize Connection */}
-          <div className="lg:col-span-6 space-y-6">
-            <GlassCard className="p-5 sm:p-7 lg:p-8">
-              <div className="flex items-center gap-3 mb-6 pb-3 border-b border-[#9b5de5]/15">
-                <div className="p-2 rounded-xl bg-[#9b5de5]/15 border border-[#9b5de5]/25">
-                  <Cpu className="w-5 h-5 text-[#c084fc]" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold text-white font-mono">Initialize Connection</h2>
-                  <p className="text-xs text-gray-500 font-mono">Deploy secure WhatsApp session</p>
-                </div>
-              </div>
-
-              {/* Method Switcher */}
-              <div className="relative flex gap-2 mb-8 p-1.5 rounded-xl bg-[#0d0820]/60 border border-[#9b5de5]/20">
-                <div
-                  className={`absolute top-1.5 bottom-1.5 w-[calc(50%-4px)] rounded-lg bg-gradient-to-r from-[#9b5de5]/20 to-[#7c3aed]/20 border border-[#c084fc]/40 transition-all duration-300 ease-out ${
-                    activeMethod === "pairing" ? "left-1.5" : "left-[calc(50%-2px)]"
-                  }`}
-                />
-                <button
-                  data-testid="button-method-pairing"
-                  className={`relative flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-mono text-sm transition-all z-10 ${
-                    activeMethod === "pairing" ? "text-[#c084fc]" : "text-gray-500 hover:text-gray-300"
-                  }`}
-                  onClick={() => setActiveMethod("pairing")}
-                >
-                  <Hash className="w-4 h-4" />
-                  Pairing Code
-                </button>
-                <button
-                  data-testid="button-method-qr"
-                  className={`relative flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-mono text-sm transition-all z-10 ${
-                    activeMethod === "qr" ? "text-[#c084fc]" : "text-gray-500 hover:text-gray-300"
-                  }`}
-                  onClick={() => setActiveMethod("qr")}
-                >
-                  <QrCode className="w-4 h-4" />
-                  QR Scan
-                </button>
-              </div>
-
-              {activeMethod === "pairing" && (
-                <div className="space-y-5 animate-fade-in-up">
-                  <div>
-                    <label className="block text-gray-400 text-xs uppercase tracking-wider font-mono mb-2 flex items-center gap-2">
-                      <Server className="w-3 h-3" />
-                      Deployment Server
-                    </label>
-                    <div className="grid grid-cols-5 gap-2">
-                      {[1, 2, 3, 4, 5].map((num) => (
-                        <button
-                          key={num}
-                          data-testid={`button-server-${num}`}
-                          onClick={() => setPairServer(num)}
-                          className={`py-2.5 rounded-xl border font-mono text-sm transition-all ${
-                            pairServer === num
-                              ? "bg-[#9b5de5]/15 border-[#c084fc]/50 text-[#c084fc] shadow-lg shadow-[#9b5de5]/10"
-                              : "bg-[#0d0820]/40 text-gray-500 border-[#9b5de5]/20 hover:border-[#9b5de5]/40 hover:text-gray-300"
-                          }`}
-                        >
-                          S{num}
-                        </button>
-                      ))}
+          <div className="relative grid grid-cols-1 lg:grid-cols-10 gap-6 lg:gap-8">
+            
+            {/* Left Column - Initialize Connection */}
+            <div className="lg:col-span-6 space-y-6 animate-fade-in-up">
+              <div className="floating-card-main">
+                <GlassCard className="p-5 sm:p-7 lg:p-8 floating-glow">
+                  <div className="flex items-center gap-3 mb-6 pb-3 border-b border-[#9b5de5]/15">
+                    <div className="p-2 rounded-xl bg-[#9b5de5]/15 border border-[#9b5de5]/25">
+                      <Cpu className="w-5 h-5 text-[#c084fc]" />
                     </div>
-                  </div>
-                  <div>
-                    <label className="block text-gray-400 text-xs uppercase tracking-wider font-mono mb-2 flex items-center gap-2">
-                      <Smartphone className="w-3 h-3" />
-                      WhatsApp Number
-                    </label>
-                    <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-mono text-sm">+</div>
-                      <input
-                        data-testid="input-phone"
-                        type="tel"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                        placeholder="1234567890"
-                        className="w-full pl-8 pr-4 py-3.5 bg-[#0d0820]/60 border border-[#9b5de5]/20 rounded-xl font-mono text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-[#c084fc]/50 focus:ring-1 focus:ring-[#c084fc]/20 transition-all"
-                      />
-                    </div>
-                    <p className="text-gray-600 text-[10px] font-mono mt-2">
-                      Include country code (e.g., 2348012345678)
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {activeMethod === "qr" && (
-                <div className="text-center py-8 animate-fade-in-up">
-                  <div className="inline-flex flex-col items-center gap-3 px-6 py-4 rounded-xl bg-[#0d0820]/40 border border-[#9b5de5]/20">
-                    <QrCode className="w-8 h-8 text-[#c084fc]/60" />
-                    <p className="text-gray-400 text-sm font-mono">
-                      QR code will be generated from WhatsApp servers
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              <button
-                data-testid="button-generate"
-                disabled={generateMutation.isPending || (activeMethod === "pairing" && !phoneNumber) || !!currentSessionId}
-                onClick={() => generateMutation.mutate(activeMethod)}
-                className="w-full mt-7 flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-[#9b5de5]/20 to-[#7c3aed]/20 border border-[#c084fc]/40 rounded-xl font-mono text-sm transition-all hover:from-[#9b5de5]/30 hover:to-[#7c3aed]/30 hover:scale-[1.01] disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed"
-                style={{ color: "#c084fc", boxShadow: "0 0 15px rgba(155,93,229,0.15)" }}
-              >
-                {generateMutation.isPending ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Deploying Session...
-                  </>
-                ) : currentSessionId ? (
-                  <>
-                    <Wifi className="w-4 h-4" />
-                    Session Live
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    Generate Session
-                  </>
-                )}
-              </button>
-            </GlassCard>
-
-            {/* Active Session Section */}
-            {currentSessionId && (
-              <GlassCard className="p-5 sm:p-7 lg:p-8 animate-fade-in-up">
-                <div className="flex items-center gap-3 mb-6 pb-3 border-b border-[#9b5de5]/15">
-                  <div className="p-2 rounded-xl bg-[#9b5de5]/15 border border-[#9b5de5]/25">
-                    {isConnected ? <Key className="w-5 h-5 text-[#c084fc]" /> : <Wifi className="w-5 h-5 text-[#c084fc]" />}
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-bold text-white font-mono">
-                      {isConnected ? "Session Credentials" : "Active Deployment"}
-                    </h2>
-                    <p className="text-xs text-gray-500 font-mono">
-                      {isConnected ? "Your WhatsApp session ID" : "Real-time connection status"}
-                    </p>
-                  </div>
-                  <div className="ml-auto flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : isFailed ? "bg-red-500" : "bg-[#c084fc]"} animate-pulse`} />
-                    <span className="text-[10px] font-mono text-gray-500">
-                      {isConnected ? "CONNECTED" : isFailed ? "FAILED" : "ACTIVE"}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {/* Pairing Code - Priority display */}
-                  {displayPairingCode && (
                     <div>
-                      <label className="block text-gray-500 text-[10px] uppercase tracking-wider font-mono mb-2">
-                        Pairing Code
-                      </label>
-                      <div
-                        className="flex items-center justify-between gap-3 p-5 bg-[#0d0820]/60 rounded-xl border border-[#c084fc]/30 cursor-pointer transition-all hover:border-[#c084fc]/60 group"
-                        onClick={() => handleCopy(displayPairingCode, "pairing")}
-                        data-testid="button-copy-pairing"
-                      >
-                        <span
-                          className="font-mono text-2xl sm:text-3xl tracking-[0.25em] font-bold"
-                          style={{ color: "#c084fc", textShadow: "0 0 20px rgba(155,93,229,0.4)" }}
-                          data-testid="text-pairing-code"
-                        >
-                          {formatPairingCode(displayPairingCode)}
-                        </span>
-                        {copiedPairing ? (
-                          <Check className="w-5 h-5 text-[#c084fc] shrink-0" />
-                        ) : (
-                          <Copy className="w-5 h-5 text-gray-500 shrink-0 group-hover:text-[#c084fc] transition-colors" />
+                      <h2 className="text-lg font-bold text-white font-mono">Initialize Connection</h2>
+                      <p className="text-xs text-gray-500 font-mono">Deploy secure WhatsApp session</p>
+                    </div>
+                  </div>
+
+                  {/* Method Switcher */}
+                  <div className="relative flex gap-2 mb-8 p-1.5 rounded-xl bg-[#0d0820]/60 border border-[#9b5de5]/20">
+                    <div
+                      className={`absolute top-1.5 bottom-1.5 w-[calc(50%-4px)] rounded-lg bg-gradient-to-r from-[#9b5de5]/20 to-[#7c3aed]/20 border border-[#c084fc]/40 transition-all duration-300 ease-out ${
+                        activeMethod === "pairing" ? "left-1.5" : "left-[calc(50%-2px)]"
+                      }`}
+                    />
+                    <button
+                      data-testid="button-method-pairing"
+                      className={`relative flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-mono text-sm transition-all z-10 ${
+                        activeMethod === "pairing" ? "text-[#c084fc]" : "text-gray-500 hover:text-gray-300"
+                      }`}
+                      onClick={() => setActiveMethod("pairing")}
+                    >
+                      <Hash className="w-4 h-4" />
+                      Pairing Code
+                    </button>
+                    <button
+                      data-testid="button-method-qr"
+                      className={`relative flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-mono text-sm transition-all z-10 ${
+                        activeMethod === "qr" ? "text-[#c084fc]" : "text-gray-500 hover:text-gray-300"
+                      }`}
+                      onClick={() => setActiveMethod("qr")}
+                    >
+                      <QrCode className="w-4 h-4" />
+                      QR Scan
+                    </button>
+                  </div>
+
+                  {activeMethod === "pairing" && (
+                    <div className="space-y-5 animate-fade-in-up">
+                      <div>
+                        <label className="block text-gray-400 text-xs uppercase tracking-wider font-mono mb-3 flex items-center gap-2">
+                          <Server className="w-3 h-3" />
+                          Select Pair Server
+                        </label>
+                        <div className="grid grid-cols-5 gap-2">
+                          {serverOptions.map((server) => (
+                            <button
+                              key={server.id}
+                              data-testid={`button-server-${server.id}`}
+                              onClick={() => setPairServer(server.id)}
+                              className={`py-3 px-2 rounded-xl border font-mono text-xs transition-all duration-300 transform hover:scale-105 relative overflow-hidden group ${
+                                pairServer === server.id
+                                  ? "bg-gradient-to-br from-[#9b5de5]/25 to-[#7c3aed]/15 border-[#c084fc]/60 text-[#c084fc] shadow-lg shadow-[#9b5de5]/20"
+                                  : "bg-[#0d0820]/60 text-gray-400 border-[#9b5de5]/20 hover:border-[#9b5de5]/40 hover:text-gray-200"
+                              }`}
+                            >
+                              <div className="relative z-10">
+                                <div className="font-bold text-sm">{server.name}</div>
+                                <div className="text-[9px] text-gray-500 mt-0.5">{server.region}</div>
+                              </div>
+                              {pairServer === server.id && (
+                                <div className="absolute top-1 right-1 w-2 h-2 bg-[#c084fc] rounded-full animate-pulse" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                        {pairServer && (
+                          <p className="text-gray-500 text-[10px] font-mono mt-3 text-center">
+                            Selected: <span className="text-[#c084fc]">{serverOptions.find(s => s.id === pairServer)?.region}</span>
+                          </p>
                         )}
                       </div>
-                      <p className="text-gray-600 text-[10px] font-mono mt-2">
-                        WhatsApp → Linked Devices → Link with code
-                      </p>
-                    </div>
-                  )}
-
-                  {/* QR Code */}
-                  {displayQrCode && (
-                    <div>
-                      <label className="block text-gray-500 text-[10px] uppercase tracking-wider font-mono mb-2">
-                        QR Scan Code
-                      </label>
-                      <div className="flex justify-center p-6 bg-white rounded-xl">
-                        <img
-                          src={displayQrCode}
-                          alt="WhatsApp QR Code"
-                          className="w-44 h-44 sm:w-52 sm:h-52"
-                          data-testid="img-qr-code"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Waiting for Pairing Code */}
-                  {activeMethod === "pairing" && !displayPairingCode && !displayQrCode && isConnecting && !isFailed && (
-                    <div className="flex items-center justify-center gap-3 p-6 bg-[#0d0820]/40 rounded-xl border border-[#9b5de5]/20">
-                      <Loader2 className="w-5 h-5 text-[#c084fc] animate-spin shrink-0" />
-                      <span className="text-gray-400 font-mono text-sm">Requesting pairing code...</span>
-                    </div>
-                  )}
-
-                  {/* Waiting for QR Code */}
-                  {activeMethod === "qr" && !displayQrCode && !displayPairingCode && isConnecting && !isFailed && (
-                    <div className="flex items-center justify-center gap-3 p-6 bg-[#0d0820]/40 rounded-xl border border-[#9b5de5]/20">
-                      <Loader2 className="w-5 h-5 text-[#c084fc] animate-spin shrink-0" />
-                      <span className="text-gray-400 font-mono text-sm">Generating QR code...</span>
-                    </div>
-                  )}
-
-                  {/* Session Credentials - Only when connected */}
-                  {isConnected && displayCredentials && (
-                    <div className="mt-4 pt-4 border-t border-[#9b5de5]/15">
-                      <div className="flex items-center justify-between mb-2">
-                        <label className="block text-gray-500 text-[10px] uppercase tracking-wider font-mono flex items-center gap-2">
-                          <Key className="w-3 h-3 text-[#c084fc]" />
-                          WhatsApp Session ID
-                        </label>
-                        <button
-                          data-testid="button-copy-credentials"
-                          onClick={() => handleCopy(formatFullCredentials(displayCredentials), "creds")}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#9b5de5]/10 border border-[#c084fc]/30 font-mono text-xs text-[#c084fc] transition-all hover:bg-[#9b5de5]/20"
-                        >
-                          {copiedCreds ? (
-                            <>
-                              <Check className="w-3 h-3" />
-                              Copied
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3 h-3" />
-                              Copy
-                            </>
-                          )}
-                        </button>
-                      </div>
-                      <div
-                        className="p-4 bg-[#0d0820]/60 rounded-xl border border-[#c084fc]/30 cursor-pointer transition-all hover:border-[#c084fc]/50"
-                        onClick={() => handleCopy(formatFullCredentials(displayCredentials), "creds")}
-                        data-testid="div-credentials"
-                      >
-                        <code className="font-mono text-xs sm:text-sm text-[#c084fc]/90 break-all" data-testid="text-credentials">
-                          {formatFullCredentials(displayCredentials)}
-                        </code>
-                      </div>
-                      <p className="text-gray-600 text-[10px] font-mono mt-3">
-                        ✓ Session ID sent to your WhatsApp DM • Keep it private • One-time use
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Failed State */}
-                  {isFailed && (
-                    <div className="flex items-center gap-3 p-4 bg-red-500/10 rounded-xl border border-red-500/30">
-                      <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
                       <div>
-                        <p className="text-red-400 font-mono text-sm font-medium">Deployment Failed</p>
-                        <p className="text-red-400/60 font-mono text-xs">Terminate and retry</p>
+                        <label className="block text-gray-400 text-xs uppercase tracking-wider font-mono mb-2 flex items-center gap-2">
+                          <Smartphone className="w-3 h-3" />
+                          WhatsApp Number
+                        </label>
+                        <div className="relative">
+                          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-mono text-sm">+</div>
+                          <input
+                            data-testid="input-phone"
+                            type="tel"
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
+                            placeholder="1234567890"
+                            className="w-full pl-8 pr-4 py-3.5 bg-[#0d0820]/60 border border-[#9b5de5]/20 rounded-xl font-mono text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-[#c084fc]/50 focus:ring-1 focus:ring-[#c084fc]/20 transition-all"
+                          />
+                        </div>
+                        <p className="text-gray-600 text-[10px] font-mono mt-2">
+                          Include country code (e.g., 2348012345678)
+                        </p>
                       </div>
                     </div>
                   )}
-                </div>
 
-                <button
-                  data-testid="button-terminate"
-                  onClick={() => terminateMutation.mutate()}
-                  disabled={terminateMutation.isPending}
-                  className="mt-6 flex items-center gap-2 px-4 py-2.5 bg-red-500/10 border border-red-500/30 rounded-xl font-mono text-xs text-red-400 transition-all hover:bg-red-500/20 hover:border-red-500/50"
-                >
-                  {terminateMutation.isPending ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Trash2 className="w-3.5 h-3.5" />
+                  {activeMethod === "qr" && (
+                    <div className="text-center py-8 animate-fade-in-up">
+                      <div className="inline-flex flex-col items-center gap-3 px-6 py-4 rounded-xl bg-[#0d0820]/40 border border-[#9b5de5]/20">
+                        <QrCode className="w-8 h-8 text-[#c084fc]/60" />
+                        <p className="text-gray-400 text-sm font-mono">
+                          QR code will be generated from WhatsApp servers
+                        </p>
+                      </div>
+                    </div>
                   )}
-                  Terminate Session
-                </button>
+
+                  <button
+                    data-testid="button-generate"
+                    disabled={generateMutation.isPending || (activeMethod === "pairing" && !phoneNumber) || !!currentSessionId}
+                    onClick={() => generateMutation.mutate(activeMethod)}
+                    className="w-full mt-7 flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-[#9b5de5]/20 to-[#7c3aed]/20 border border-[#c084fc]/40 rounded-xl font-mono text-sm font-bold transition-all hover:from-[#9b5de5]/30 hover:to-[#7c3aed]/30 hover:shadow-lg hover:shadow-[#9b5de5]/20 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wide"
+                    style={{ color: "#c084fc", boxShadow: "0 0 15px rgba(155,93,229,0.15)" }}
+                  >
+                    {generateMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Deploying Session...
+                      </>
+                    ) : currentSessionId ? (
+                      <>
+                        <Wifi className="w-4 h-4" />
+                        Session Live
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        Generate Session
+                      </>
+                    )}
+                  </button>
+                </GlassCard>
+              </div>
+
+              {/* Active Session Section */}
+              {currentSessionId && (
+                <div className="floating-card-active">
+                  <GlassCard className="p-5 sm:p-7 lg:p-8 floating-glow animate-fade-in-up">
+                    <div className="flex items-center gap-3 mb-6 pb-3 border-b border-[#9b5de5]/15">
+                      <div className="p-2 rounded-xl bg-[#9b5de5]/15 border border-[#9b5de5]/25">
+                        {isConnected ? <Key className="w-5 h-5 text-[#c084fc]" /> : <Wifi className="w-5 h-5 text-[#c084fc]" />}
+                      </div>
+                      <div>
+                        <h2 className="text-lg font-bold text-white font-mono">
+                          {isConnected ? "Session Credentials" : "Active Deployment"}
+                        </h2>
+                        <p className="text-xs text-gray-500 font-mono">
+                          {isConnected ? "Your WhatsApp session ID" : "Real-time connection status"}
+                        </p>
+                      </div>
+                      <div className="ml-auto flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : isFailed ? "bg-red-500" : "bg-[#c084fc]"} animate-pulse`} />
+                        <span className="text-[10px] font-mono text-gray-500">
+                          {isConnected ? "CONNECTED" : isFailed ? "FAILED" : "ACTIVE"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      {/* Pairing Code - Priority display */}
+                      {displayPairingCode && (
+                        <div>
+                          <label className="block text-gray-500 text-[10px] uppercase tracking-wider font-mono mb-2">
+                            Pairing Code
+                          </label>
+                          <div
+                            className="flex items-center justify-between gap-3 p-5 bg-[#0d0820]/60 rounded-xl border border-[#c084fc]/30 cursor-pointer transition-all hover:border-[#c084fc]/60 group"
+                            onClick={() => handleCopy(displayPairingCode, "pairing")}
+                            data-testid="button-copy-pairing"
+                          >
+                            <span
+                              className="font-mono text-2xl sm:text-3xl tracking-[0.25em] font-bold"
+                              style={{ color: "#c084fc", textShadow: "0 0 20px rgba(155,93,229,0.4)" }}
+                              data-testid="text-pairing-code"
+                            >
+                              {formatPairingCode(displayPairingCode)}
+                            </span>
+                            {copiedPairing ? (
+                              <Check className="w-5 h-5 text-[#c084fc] shrink-0" />
+                            ) : (
+                              <Copy className="w-5 h-5 text-gray-500 shrink-0 group-hover:text-[#c084fc] transition-colors" />
+                            )}
+                          </div>
+                          <p className="text-gray-600 text-[10px] font-mono mt-2">
+                            WhatsApp → Linked Devices → Link with code
+                          </p>
+                        </div>
+                      )}
+
+                      {/* QR Code */}
+                      {displayQrCode && (
+                        <div>
+                          <label className="block text-gray-500 text-[10px] uppercase tracking-wider font-mono mb-2">
+                            QR Scan Code
+                          </label>
+                          <div className="flex justify-center p-6 bg-white rounded-xl">
+                            <img
+                              src={displayQrCode}
+                              alt="WhatsApp QR Code"
+                              className="w-44 h-44 sm:w-52 sm:h-52"
+                              data-testid="img-qr-code"
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Waiting for Pairing Code */}
+                      {activeMethod === "pairing" && !displayPairingCode && !displayQrCode && isConnecting && !isFailed && (
+                        <div className="flex items-center justify-center gap-3 p-6 bg-[#0d0820]/40 rounded-xl border border-[#9b5de5]/20">
+                          <Loader2 className="w-5 h-5 text-[#c084fc] animate-spin shrink-0" />
+                          <span className="text-gray-400 font-mono text-sm">Requesting pairing code...</span>
+                        </div>
+                      )}
+
+                      {/* Waiting for QR Code */}
+                      {activeMethod === "qr" && !displayQrCode && !displayPairingCode && isConnecting && !isFailed && (
+                        <div className="flex items-center justify-center gap-3 p-6 bg-[#0d0820]/40 rounded-xl border border-[#9b5de5]/20">
+                          <Loader2 className="w-5 h-5 text-[#c084fc] animate-spin shrink-0" />
+                          <span className="text-gray-400 font-mono text-sm">Generating QR code...</span>
+                        </div>
+                      )}
+
+                      {/* Session Credentials - Only when connected */}
+                      {isConnected && displayCredentials && (
+                        <div className="mt-4 pt-4 border-t border-[#9b5de5]/15">
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="block text-gray-500 text-[10px] uppercase tracking-wider font-mono flex items-center gap-2">
+                              <Key className="w-3 h-3 text-[#c084fc]" />
+                              WhatsApp Session ID
+                            </label>
+                            <button
+                              data-testid="button-copy-credentials"
+                              onClick={() => handleCopy(formatFullCredentials(displayCredentials), "creds")}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#9b5de5]/10 border border-[#c084fc]/30 font-mono text-xs text-[#c084fc] transition-all hover:bg-[#9b5de5]/20"
+                            >
+                              {copiedCreds ? (
+                                <>
+                                  <Check className="w-3 h-3" />
+                                  Copied
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3 h-3" />
+                                  Copy
+                                </>
+                              )}
+                            </button>
+                          </div>
+                          <div
+                            className="p-4 bg-[#0d0820]/60 rounded-xl border border-[#c084fc]/30 cursor-pointer transition-all hover:border-[#c084fc]/50"
+                            onClick={() => handleCopy(formatFullCredentials(displayCredentials), "creds")}
+                            data-testid="div-credentials"
+                          >
+                            <code className="font-mono text-xs sm:text-sm text-[#c084fc]/90 break-all" data-testid="text-credentials">
+                              {formatFullCredentials(displayCredentials)}
+                            </code>
+                          </div>
+                          <p className="text-gray-600 text-[10px] font-mono mt-3">
+                            ✓ Session ID sent to your WhatsApp DM • Keep it private • One-time use
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Failed State */}
+                      {isFailed && (
+                        <div className="flex items-center gap-3 p-4 bg-red-500/10 rounded-xl border border-red-500/30">
+                          <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+                          <div>
+                            <p className="text-red-400 font-mono text-sm font-medium">Deployment Failed</p>
+                            <p className="text-red-400/60 font-mono text-xs">Terminate and retry</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      data-testid="button-terminate"
+                      onClick={() => terminateMutation.mutate()}
+                      disabled={terminateMutation.isPending}
+                      className="mt-6 flex items-center gap-2 px-4 py-2.5 bg-red-500/10 border border-red-500/30 rounded-xl font-mono text-xs text-red-400 transition-all hover:bg-red-500/20 hover:border-red-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {terminateMutation.isPending ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-3.5 h-3.5" />
+                      )}
+                      Terminate Session
+                    </button>
+                  </GlassCard>
+                </div>
+              )}
+            </div>
+
+            {/* Right Column - Sidebar */}
+            <div className="lg:col-span-4 space-y-6 animate-fade-in-up animation-delay-100">
+              
+              {/* Hero Stats */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-gradient-to-br from-[#0d0820]/60 to-[#0d0820]/30 backdrop-blur-sm rounded-2xl p-4 text-center border border-[#9b5de5]/20 hover:border-[#c084fc]/30 transition-all hover:scale-105 duration-300">
+                  <div className="text-2xl font-bold text-[#c084fc] font-mono">2</div>
+                  <div className="text-[10px] text-gray-500 font-mono mt-1">PAIRING MODES</div>
+                </div>
+                <div className="bg-gradient-to-br from-[#0d0820]/60 to-[#0d0820]/30 backdrop-blur-sm rounded-2xl p-4 text-center border border-[#9b5de5]/20 hover:border-[#c084fc]/30 transition-all hover:scale-105 duration-300">
+                  <div className="text-2xl font-bold text-[#c084fc] font-mono">&lt;5s</div>
+                  <div className="text-[10px] text-gray-500 font-mono mt-1">DEPLOY TIME</div>
+                </div>
+                <div className="bg-gradient-to-br from-[#0d0820]/60 to-[#0d0820]/30 backdrop-blur-sm rounded-2xl p-4 text-center border border-[#9b5de5]/20 hover:border-[#c084fc]/30 transition-all hover:scale-105 duration-300">
+                  <div className="text-2xl font-bold text-[#c084fc] font-mono">E2E</div>
+                  <div className="text-[10px] text-gray-500 font-mono mt-1">ENCRYPTION</div>
+                </div>
+                <div className="bg-gradient-to-br from-[#0d0820]/60 to-[#0d0820]/30 backdrop-blur-sm rounded-2xl p-4 text-center border border-[#9b5de5]/20 hover:border-[#c084fc]/30 transition-all hover:scale-105 duration-300">
+                  <div className="text-2xl font-bold text-[#c084fc] font-mono">24/7</div>
+                  <div className="text-[10px] text-gray-500 font-mono mt-1">UPTIME</div>
+                </div>
+              </div>
+
+              {/* Quick Links */}
+              <GlassCard className="p-5 sm:p-6 floating-glow">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 rounded-xl bg-[#9b5de5]/10 border border-[#9b5de5]/20">
+                    <Link2 className="w-4 h-4 text-[#c084fc]" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-bold text-white font-mono">Resources</h2>
+                    <p className="text-[10px] text-gray-500 font-mono">Quick navigation</p>
+                  </div>
+                </div>
+                <QuickLinksSection />
               </GlassCard>
-            )}
-          </div>
 
-          {/* Right Column - Sidebar */}
-          <div className="lg:col-span-4 space-y-6">
-            
-            {/* Hero Stats */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gradient-to-br from-[#0d0820]/60 to-[#0d0820]/30 backdrop-blur-sm rounded-2xl p-4 text-center border border-[#9b5de5]/20 hover:border-[#c084fc]/30 transition-all">
-                <div className="text-2xl font-bold text-[#c084fc] font-mono">2</div>
-                <div className="text-[10px] text-gray-500 font-mono mt-1">PAIRING MODES</div>
+              {/* Feature Grid */}
+              <div className="grid grid-cols-1 gap-3">
+                <FeatureCard
+                  icon={Shield}
+                  title="Zero-Knowledge Security"
+                  desc="End-to-end encrypted sessions"
+                />
+                <FeatureCard
+                  icon={Zap}
+                  title="Sub-5 Second Deploy"
+                  desc="Lightning fast connection"
+                />
+                <FeatureCard
+                  icon={SiWhatsapp}
+                  title="Multi-Device Native"
+                  desc="Full WhatsApp MD support"
+                />
               </div>
-              <div className="bg-gradient-to-br from-[#0d0820]/60 to-[#0d0820]/30 backdrop-blur-sm rounded-2xl p-4 text-center border border-[#9b5de5]/20 hover:border-[#c084fc]/30 transition-all">
-                <div className="text-2xl font-bold text-[#c084fc] font-mono">&lt;5s</div>
-                <div className="text-[10px] text-gray-500 font-mono mt-1">DEPLOY TIME</div>
-              </div>
-              <div className="bg-gradient-to-br from-[#0d0820]/60 to-[#0d0820]/30 backdrop-blur-sm rounded-2xl p-4 text-center border border-[#9b5de5]/20 hover:border-[#c084fc]/30 transition-all">
-                <div className="text-2xl font-bold text-[#c084fc] font-mono">E2E</div>
-                <div className="text-[10px] text-gray-500 font-mono mt-1">ENCRYPTION</div>
-              </div>
-              <div className="bg-gradient-to-br from-[#0d0820]/60 to-[#0d0820]/30 backdrop-blur-sm rounded-2xl p-4 text-center border border-[#9b5de5]/20 hover:border-[#c084fc]/30 transition-all">
-                <div className="text-2xl font-bold text-[#c084fc] font-mono">24/7</div>
-                <div className="text-[10px] text-gray-500 font-mono mt-1">UPTIME</div>
-              </div>
-            </div>
 
-            {/* Quick Links */}
-            <GlassCard className="p-5 sm:p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-xl bg-[#9b5de5]/10 border border-[#9b5de5]/20">
-                  <Link2 className="w-4 h-4 text-[#c084fc]" />
+              <GlassCard className="p-4 bg-gradient-to-r from-yellow-500/5 to-transparent floating-glow">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertCircle className="w-3.5 h-3.5 text-yellow-500/70" />
+                  <span className="text-[10px] font-mono text-yellow-500/70 uppercase tracking-wider">Security Notice</span>
                 </div>
-                <div>
-                  <h2 className="text-sm font-bold text-white font-mono">Resources</h2>
-                  <p className="text-[10px] text-gray-500 font-mono">Quick navigation</p>
-                </div>
-              </div>
-              <QuickLinksSection />
-            </GlassCard>
-
-            {/* Feature Grid */}
-            <div className="grid grid-cols-1 gap-3">
-              <FeatureCard
-                icon={Shield}
-                title="Zero-Knowledge Security"
-                desc="End-to-end encrypted sessions"
-              />
-              <FeatureCard
-                icon={Zap}
-                title="Sub-5 Second Deploy"
-                desc="Lightning fast connection"
-              />
-              <FeatureCard
-                icon={SiWhatsapp}
-                title="Multi-Device Native"
-                desc="Full WhatsApp MD support"
-              />
+                <p className="text-gray-600 text-[10px] font-mono leading-relaxed">
+                  Your session credentials are sent to your WhatsApp DM only once. Keep them secure.
+                </p>
+              </GlassCard>
             </div>
-
-            <GlassCard className="p-4 bg-gradient-to-r from-yellow-500/5 to-transparent">
-              <div className="flex items-center gap-2 mb-2">
-                <AlertCircle className="w-3.5 h-3.5 text-yellow-500/70" />
-                <span className="text-[10px] font-mono text-yellow-500/70 uppercase tracking-wider">Security Notice</span>
-              </div>
-              <p className="text-gray-600 text-[10px] font-mono leading-relaxed">
-                Your session credentials are sent to your WhatsApp DM only once. Keep them secure.
-              </p>
-            </GlassCard>
           </div>
         </div>
 
@@ -738,6 +766,17 @@ export default function Home() {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.5; }
         }
+        @keyframes floating-glow {
+          0%, 100% {
+            box-shadow: 0 0 20px rgba(155, 93, 229, 0.15), 0 0 40px rgba(155, 93, 229, 0.08),
+              inset 0 0 30px rgba(192, 132, 252, 0.05);
+          }
+          50% {
+            box-shadow: 0 0 30px rgba(155, 93, 229, 0.25), 0 0 60px rgba(155, 93, 229, 0.12),
+              inset 0 0 40px rgba(192, 132, 252, 0.08);
+          }
+        }
+        
         .animate-drift { animation: drift 14s ease-in-out infinite; }
         .animate-blink-dot { animation: blink-dot 1.8s ease-in-out infinite; }
         .animate-fade-in-down { animation: fade-in-down 0.8s ease both; }
@@ -749,6 +788,18 @@ export default function Home() {
         .animation-delay-[-6s] { animation-delay: -6s; }
         .animation-delay-[-10s] { animation-delay: -10s; }
         .bg-radial { background: radial-gradient(ellipse at center, var(--tw-gradient-stops)); }
+        
+        .floating-glow {
+          animation: floating-glow 4s ease-in-out infinite !important;
+        }
+        
+        .floating-card-main {
+          filter: drop-shadow(0 0 30px rgba(155, 93, 229, 0.1));
+        }
+        
+        .floating-card-active {
+          filter: drop-shadow(0 0 25px rgba(192, 132, 252, 0.15));
+        }
       `}</style>
     </div>
   );
